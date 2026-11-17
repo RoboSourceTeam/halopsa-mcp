@@ -3,7 +3,8 @@
  *
  * Some Halo list endpoints (/Agent, /Team, /Category, /AssetType) return a
  * bare JSON array and ignore page_size, while others return
- * `{ record_count, <key>: [...] }`. Reading `response.<key>` off a bare array
+ * `{ record_count, <key>: [...] }`; paginated /Agent returns
+ * `{ record_count, results: [...] }`. Reading `response.<key>` off a bare array
  * yields undefined, so the tool reported no rows.
  */
 export interface NormalizedList<T = unknown> {
@@ -23,7 +24,7 @@ export function normalizeListResponse<T = unknown>(
     records = response as T[];
   } else if (response && typeof response === "object") {
     const obj = response as Record<string, unknown>;
-    const value = obj[key];
+    const value = Array.isArray(obj[key]) ? obj[key] : obj.results;
     records = Array.isArray(value) ? (value as T[]) : [];
     recordCount = typeof obj.record_count === "number" ? obj.record_count : undefined;
   } else {

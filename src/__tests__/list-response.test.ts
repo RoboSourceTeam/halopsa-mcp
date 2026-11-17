@@ -12,6 +12,14 @@ describe("normalizeListResponse", () => {
     expect(result).toEqual({ record_count: 40, records: [{ id: 1 }] });
   });
 
+  it("reads the results key that paginated /Agent returns", () => {
+    const result = normalizeListResponse(
+      { page_no: 1, page_size: 50, record_count: 12, results: [{ id: 1 }] },
+      "agents"
+    );
+    expect(result).toEqual({ record_count: 12, records: [{ id: 1 }] });
+  });
+
   it("returns no rows for an object missing the key", () => {
     expect(normalizeListResponse({ record_count: 3 }, "agents")).toEqual({
       record_count: 3,
