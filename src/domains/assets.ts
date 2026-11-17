@@ -7,6 +7,7 @@
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import type { DomainHandler, CallToolResult } from "../utils/types.js";
 import { getClient } from "../utils/client.js";
+import { normalizeListResponse } from "../utils/list-response.js";
 
 /**
  * Get asset domain tools
@@ -164,6 +165,7 @@ async function handleCall(
       const response = await client.assetTypes.list({
         pageSize: limit,
       });
+      const list = normalizeListResponse(response, "asset_types", { pageSize: limit });
 
       return {
         content: [
@@ -171,8 +173,8 @@ async function handleCall(
             type: "text",
             text: JSON.stringify(
               {
-                record_count: response.record_count,
-                asset_types: response.asset_types,
+                record_count: list.record_count,
+                asset_types: list.records,
               },
               null,
               2

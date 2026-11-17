@@ -9,6 +9,7 @@
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import type { DomainHandler, CallToolResult } from "../utils/types.js";
 import { getClient } from "../utils/client.js";
+import { normalizeListResponse } from "../utils/list-response.js";
 import {
   categoryGetSchema,
   categoryListSchema,
@@ -88,6 +89,7 @@ async function handleCall(
         count: true,
       };
       const response = await client.categories.list(request);
+      const list = normalizeListResponse(response, "categories", { pageSize: limit, pageNo });
 
       return {
         content: [
@@ -95,10 +97,10 @@ async function handleCall(
             type: "text",
             text: JSON.stringify(
               {
-                record_count: response.record_count,
+                record_count: list.record_count,
                 page_no: pageNo,
                 page_size: limit,
-                categories: response.categories,
+                categories: list.records,
               },
               null,
               2

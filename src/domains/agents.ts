@@ -7,6 +7,7 @@
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import type { DomainHandler, CallToolResult } from "../utils/types.js";
 import { getClient } from "../utils/client.js";
+import { normalizeListResponse } from "../utils/list-response.js";
 
 /**
  * Get agent domain tools
@@ -79,6 +80,7 @@ async function handleCall(
         inactive: args.inactive as boolean | undefined,
         pageSize: limit,
       });
+      const list = normalizeListResponse(response, "agents", { pageSize: limit });
 
       return {
         content: [
@@ -86,8 +88,8 @@ async function handleCall(
             type: "text",
             text: JSON.stringify(
               {
-                record_count: response.record_count,
-                agents: response.agents,
+                record_count: list.record_count,
+                agents: list.records,
               },
               null,
               2
@@ -111,6 +113,7 @@ async function handleCall(
       const response = await client.teams.list({
         pageSize: limit,
       });
+      const list = normalizeListResponse(response, "teams", { pageSize: limit });
 
       return {
         content: [
@@ -118,8 +121,8 @@ async function handleCall(
             type: "text",
             text: JSON.stringify(
               {
-                record_count: response.record_count,
-                teams: response.teams,
+                record_count: list.record_count,
+                teams: list.records,
               },
               null,
               2

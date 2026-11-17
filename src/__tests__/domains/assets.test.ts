@@ -221,4 +221,17 @@ describe("Assets Domain Handler", () => {
       });
     });
   });
+
+  describe("bare-array list responses", () => {
+    it("halopsa_assets_list_types returns the rows when Halo sends a bare array", async () => {
+      mockAssetTypesList.mockResolvedValueOnce([
+        { id: 1, name: "Laptop" },
+        { id: 2, name: "Server" },
+      ]);
+      const result = await assetsHandler.handleCall("halopsa_assets_list_types", {});
+      const data = JSON.parse((result.content[0] as { text: string }).text);
+      expect(data.record_count).toBe(2);
+      expect(data.asset_types).toHaveLength(2);
+    });
+  });
 });

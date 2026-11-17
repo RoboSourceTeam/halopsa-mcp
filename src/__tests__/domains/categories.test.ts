@@ -187,4 +187,20 @@ describe("Categories Domain Handler", () => {
       });
     });
   });
+
+  describe("bare-array list responses", () => {
+    it("halopsa_categories_list returns the rows when Halo sends a bare array", async () => {
+      mockCategoriesList.mockResolvedValueOnce([
+        { id: 160, category_name: "Standard Applications>Outlook" },
+      ]);
+      const result = await categoriesHandler.handleCall("halopsa_categories_list", {
+        search: "Outlook",
+      });
+      const data = JSON.parse((result.content[0] as { text: string }).text);
+      expect(data.record_count).toBe(1);
+      expect(data.categories).toEqual([
+        { id: 160, category_name: "Standard Applications>Outlook" },
+      ]);
+    });
+  });
 });

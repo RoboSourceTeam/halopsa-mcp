@@ -338,7 +338,7 @@ export function createMcpServer(): Server {
         const handler = await getDomainHandler("assets");
         return await handler.handleCall(name, toolArgs);
       }
-      if (name.startsWith("halopsa_agents_")) {
+      if (name.startsWith("halopsa_agents_") || name.startsWith("halopsa_teams_")) {
         const handler = await getDomainHandler("agents");
         return await handler.handleCall(name, toolArgs);
       }

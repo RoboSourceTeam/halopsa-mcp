@@ -187,4 +187,25 @@ describe("Agents Domain Handler", () => {
       });
     });
   });
+
+  describe("bare-array list responses", () => {
+    it("halopsa_agents_list returns the rows when Halo sends a bare array", async () => {
+      mockAgentsList.mockResolvedValueOnce([
+        { id: 1, name: "John Doe" },
+        { id: 2, name: "Jane Smith" },
+      ]);
+      const result = await agentsHandler.handleCall("halopsa_agents_list", {});
+      const data = JSON.parse((result.content[0] as { text: string }).text);
+      expect(data.record_count).toBe(2);
+      expect(data.agents).toHaveLength(2);
+    });
+
+    it("halopsa_teams_list returns the rows when Halo sends a bare array", async () => {
+      mockTeamsList.mockResolvedValueOnce([{ id: 1, name: "Support" }]);
+      const result = await agentsHandler.handleCall("halopsa_teams_list", {});
+      const data = JSON.parse((result.content[0] as { text: string }).text);
+      expect(data.record_count).toBe(1);
+      expect(data.teams).toEqual([{ id: 1, name: "Support" }]);
+    });
+  });
 });
