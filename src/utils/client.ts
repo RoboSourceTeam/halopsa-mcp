@@ -8,6 +8,7 @@
  * In stdio mode the client falls back to environment variables as before.
  */
 
+import { createHash } from "node:crypto";
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { HaloPsaClient } from "@wyre-ai/node-halopsa";
 
@@ -219,8 +220,12 @@ function tenantFromHost(host: string): string | undefined {
 const MAX_CLIENT_CACHE_SIZE = 500;
 const clientCache = new Map<string, HaloPsaClient>();
 
+// The secret is part of the key: without it, a caller with a wrong secret
+// reuses a client cached for the right one (and a rotated secret keeps
+// failing on whichever replica cached the stale one).
 function credentialKey(creds: HaloPsaCredentials): string {
-  return `${creds.clientId}:${creds.tenant ?? ""}:${creds.baseUrl ?? ""}`;
+  const secretHash = createHash("sha256").update(creds.clientSecret).digest("hex");
+  return `${creds.clientId}:${secretHash}:${creds.tenant ?? ""}:${creds.baseUrl ?? ""}`;
 }
 
 /**

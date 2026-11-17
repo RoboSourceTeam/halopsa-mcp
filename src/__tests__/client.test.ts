@@ -286,6 +286,20 @@ describe("HaloPSA Client Utilities", () => {
     });
   });
 
+  describe("client cache key", () => {
+    it("does not reuse a cached client when only the secret differs", async () => {
+      process.env.HALOPSA_CLIENT_ID = "same-id";
+      process.env.HALOPSA_CLIENT_SECRET = "right-secret";
+      process.env.HALOPSA_TENANT = "test-tenant";
+      const good = await getClient();
+
+      process.env.HALOPSA_CLIENT_SECRET = "wrong-secret";
+      const other = await getClient();
+
+      expect(other).not.toBe(good);
+    });
+  });
+
   describe("clearClient", () => {
     it("should clear cached client", async () => {
       process.env.HALOPSA_CLIENT_ID = "test-id";
